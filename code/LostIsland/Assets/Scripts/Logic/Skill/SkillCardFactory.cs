@@ -617,7 +617,7 @@ namespace LostIsland.Logic.Skill
 
             card.PassiveBonuses.Add(new SkillBonusEntry
             {
-                AttrType = AttrType.LifeSteal,
+                AttrType = AttrType.Lifesteal,
                 IsFlat = false,
                 ValuePerLevel = 0.06f, // 每级+6%吸血
                 Layer = AttrLayer.Pct_SkillCard

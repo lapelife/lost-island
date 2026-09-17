@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using LostIsland.Logic.Rune;
 using LostIsland.Entity;
+using LostIsland.Core;
 
 namespace LostIsland.Tests
 {

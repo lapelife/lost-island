@@ -254,12 +254,11 @@ namespace LostIsland.Logic.Wave
         #region 护盾系统
 
         /// <summary>
-        /// 添加护盾
+        /// 添加护盾（BOSS版本：附带日志）
         /// </summary>
-        public void AddShield(float amount)
+        public new void AddShield(float amount)
         {
-            ShieldHP += amount;
-            MaxShieldHP = Mathf.Max(MaxShieldHP, ShieldHP);
+            base.AddShield(amount);
             Debug.Log($"[BossController] 获得护盾: {amount:F0}, 当前: {ShieldHP:F0}");
         }
 

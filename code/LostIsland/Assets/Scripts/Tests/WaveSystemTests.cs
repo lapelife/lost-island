@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using LostIsland.Logic.Wave;
+using LostIsland.Logic.Battle;
 using LostIsland.Entity;
 
 namespace LostIsland.Tests

@@ -186,7 +186,7 @@ namespace LostIsland.Tests
             AssertApproximately("普通攻击伤害100", normalDamage, 100f);
 
             // 激活狂暴
-            playerCtrl.CurrentRage = 100f; // 手动加满
+            playerCtrl.AddRage(100f); // 手动加满
             bool activated = playerCtrl.ActivateRage();
             Assert("狂暴激活成功", activated);
             Assert("狂暴状态正确", playerCtrl.IsRaging);

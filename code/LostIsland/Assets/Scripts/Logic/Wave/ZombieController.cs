@@ -83,6 +83,17 @@ namespace LostIsland.Logic.Wave
         public float MaxShieldHP { get; private set; }
 
         /// <summary>
+        /// 添加护盾
+        /// </summary>
+        /// <param name="amount">护盾值</param>
+        public void AddShield(float amount)
+        {
+            if (amount <= 0f) return;
+            ShieldHP += amount;
+            MaxShieldHP = Mathf.Max(MaxShieldHP, ShieldHP);
+        }
+
+        /// <summary>
         /// 是否有护盾
         /// </summary>
         public bool HasShield => Config != null && Config.HasShield && ShieldHP > 0f;

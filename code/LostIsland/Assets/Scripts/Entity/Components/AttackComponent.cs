@@ -207,7 +207,7 @@ namespace LostIsland.Entity
 
             // 暴击判定
             float critRate = _entity.Attribute.FinalCritRate;
-            if (Random.value < critRate)
+            if (UnityEngine.Random.value < critRate)
             {
                 isCrit = true;
                 finalDamage *= _entity.Attribute.FinalCritDamage;

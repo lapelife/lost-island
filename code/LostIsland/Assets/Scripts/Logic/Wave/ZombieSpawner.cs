@@ -21,9 +21,6 @@ namespace LostIsland.Logic.Wave
         [Tooltip("每种丧尸最大池大小")]
         [SerializeField] private int _maxPoolSize = 100;
 
-        [Tooltip("扩容步长")]
-        [SerializeField] private int _expandStep = 5;
-
         #endregion
 
         #region 出生点
@@ -402,7 +399,7 @@ namespace LostIsland.Logic.Wave
 
             EventBus.Trigger(new ZombieKilledEvent
             {
-                ZombieType = zombie.ZombieType,
+                ZombieType = ToCoreZombieType(zombie.ZombieType),
                 FleshDrop = fleshDrop,
                 CrystalDrop = crystalDrop,
                 Position = zombie.MoveComp.Position
@@ -410,6 +407,27 @@ namespace LostIsland.Logic.Wave
 
             // 回收到对象池
             ReturnZombie(zombie);
+        }
+
+        /// <summary>
+        /// 将 Wave.ZombieType 映射为 Core.ZombieType
+        /// </summary>
+        private static LostIsland.Core.ZombieType ToCoreZombieType(ZombieType type)
+        {
+            switch (type)
+            {
+                case ZombieType.Normal: return LostIsland.Core.ZombieType.Normal;
+                case ZombieType.Fast: return LostIsland.Core.ZombieType.Fast;
+                case ZombieType.Heavy: return LostIsland.Core.ZombieType.Heavy;
+                case ZombieType.Exploder: return LostIsland.Core.ZombieType.Exploder;
+                case ZombieType.Poison: return LostIsland.Core.ZombieType.Poison;
+                case ZombieType.Shield: return LostIsland.Core.ZombieType.Shield;
+                case ZombieType.Summoner: return LostIsland.Core.ZombieType.Summoner;
+                case ZombieType.Charger: return LostIsland.Core.ZombieType.Charger;
+                case ZombieType.Healer: return LostIsland.Core.ZombieType.Healer;
+                case ZombieType.Invisible: return LostIsland.Core.ZombieType.Stealth;
+                default: return LostIsland.Core.ZombieType.Boss;
+            }
         }
 
         #endregion

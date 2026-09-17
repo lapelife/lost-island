@@ -74,7 +74,8 @@ namespace LostIsland.Entity
         Pct_Flesh = 12,         // L12: 腐肉升级（战斗内临时）
         Pct_Buff = 13,          // L13: 战斗buff/debuff
         Pct_SpeedUp = 14,       // L14: 成长加速（卡点触发）
-        // 注意：层级数量固定为15层
+        Flat_Tower = 15,        // L15: 塔设施固定值加成
+        // 注意：层级数量固定为16层
         Max
     }
 }

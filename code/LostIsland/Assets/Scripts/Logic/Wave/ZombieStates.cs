@@ -1,4 +1,5 @@
 using UnityEngine;
+using LostIsland.Entity;
 using LostIsland.Logic.Wave;
 
 namespace LostIsland.Logic.Wave
