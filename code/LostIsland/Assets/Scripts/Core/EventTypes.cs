@@ -183,6 +183,15 @@ namespace LostIsland.Core
         public float FlatBonus;
     }
 
+    public struct SkillCastEvent : IEvent
+    {
+        public int SlotIndex;
+        public string CardId;
+        public string CardName;
+        public int Level;
+        public Vector3 TargetPosition;
+    }
+
     // ==============================================
     // 资源事件
     // ==============================================
