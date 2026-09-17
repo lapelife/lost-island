@@ -43,6 +43,7 @@ namespace LostIsland.Core
         private static Button _primaryButton;
         private static Text _primaryBtnText;
         private static Text _waveText;
+        private static Text _hpText;
         private static Text _fleshText;
         private static Text _zombieText;
         private static Text _stateText;
@@ -213,13 +214,14 @@ namespace LostIsland.Core
             scaler.referenceResolution = new Vector2(1920f, 1080f);
             scaler.matchWidthOrHeight = 0.5f;
 
-            // 背景（半透明深色底，让场景可见）
-            GameObject background = CreatePanel(canvasGo.transform, "Background", new Color(0.06f, 0.07f, 0.09f, 0.55f));
+            // 背景（很淡的暗色，仅提升文字可读性，不遮挡场景）
+            GameObject background = CreatePanel(canvasGo.transform, "Background", new Color(0.06f, 0.07f, 0.09f, 0.25f));
             RectTransform bgRt = background.GetComponent<RectTransform>();
             bgRt.anchorMin = Vector2.zero;
             bgRt.anchorMax = Vector2.one;
             bgRt.offsetMin = Vector2.zero;
             bgRt.offsetMax = Vector2.zero;
+            background.GetComponent<Image>().raycastTarget = false;
 
             // 主菜单面板
             _mainMenuPanel = CreatePanel(canvasGo.transform, "MainMenuPanel", new Color(0f, 0f, 0f, 0f));
@@ -228,6 +230,7 @@ namespace LostIsland.Core
             mmRt.anchorMax = Vector2.one;
             mmRt.offsetMin = Vector2.zero;
             mmRt.offsetMax = Vector2.zero;
+            _mainMenuPanel.GetComponent<Image>().raycastTarget = false;
 
             // 标题
             _titleText = CreateText(_mainMenuPanel.transform, "TitleText", "迷失孤岛", 110, TextAnchor.MiddleCenter, new Color(1f, 0.85f, 0.4f, 1f));
@@ -246,27 +249,44 @@ namespace LostIsland.Core
             SetAnchored(btnRt, new Vector2(0.5f, 0.34f), new Vector2(0.5f, 0.34f), new Vector2(0f, 0f), new Vector2(420f, 100f));
             _primaryBtnText = btnRt.Find("Text").GetComponent<Text>();
 
-            // 战斗面板
-            _battlePanel = CreatePanel(canvasGo.transform, "BattlePanel", new Color(0f, 0f, 0f, 0.55f));
+            // 战斗面板（全透明布局容器，不遮挡场景）
+            _battlePanel = CreatePanel(canvasGo.transform, "BattlePanel", new Color(0f, 0f, 0f, 0f));
             _battlePanel.SetActive(false);
+            _battlePanel.GetComponent<Image>().raycastTarget = false;
             RectTransform bpRt = _battlePanel.GetComponent<RectTransform>();
             bpRt.anchorMin = Vector2.zero;
             bpRt.anchorMax = Vector2.one;
             bpRt.offsetMin = Vector2.zero;
             bpRt.offsetMax = Vector2.zero;
 
-            // 顶部信息条
-            _waveText = CreateText(_battlePanel.transform, "WaveText", "第 0 / 300 波", 34, TextAnchor.MiddleLeft, Color.white);
-            SetAnchored(_waveText.rectTransform, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(40f, -60f), new Vector2(420f, 60f));
+            // 左上角信息面板（半透明底，含波次/生命/腐肉/敌人）
+            GameObject infoPanel = CreatePanel(_battlePanel.transform, "InfoPanel", new Color(0f, 0f, 0f, 0.3f));
+            SetAnchored(infoPanel.GetComponent<RectTransform>(), new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(20f, -20f), new Vector2(460f, 250f));
+            infoPanel.GetComponent<Image>().raycastTarget = false;
 
-            _fleshText = CreateText(_battlePanel.transform, "FleshText", "腐肉: 0", 34, TextAnchor.MiddleLeft, new Color(0.5f, 1f, 0.5f, 1f));
-            SetAnchored(_fleshText.rectTransform, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(40f, -140f), new Vector2(420f, 60f));
+            _waveText = CreateText(infoPanel.transform, "WaveText", "第 0 / 300 波", 30, TextAnchor.MiddleLeft, Color.white);
+            SetAnchored(_waveText.rectTransform, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(20f, -28f), new Vector2(420f, 44f));
 
-            _zombieText = CreateText(_battlePanel.transform, "ZombieText", "敌人: 0", 34, TextAnchor.MiddleLeft, new Color(1f, 0.6f, 0.6f, 1f));
-            SetAnchored(_zombieText.rectTransform, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(40f, -220f), new Vector2(420f, 60f));
+            _hpText = CreateText(infoPanel.transform, "HpText", "生命: -/-", 30, TextAnchor.MiddleLeft, new Color(1f, 0.4f, 0.4f, 1f));
+            SetAnchored(_hpText.rectTransform, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(20f, -80f), new Vector2(420f, 44f));
 
-            _stateText = CreateText(_battlePanel.transform, "StateText", "状态: 准备阶段（白天）", 34, TextAnchor.MiddleRight, new Color(0.8f, 0.8f, 1f, 1f));
-            SetAnchored(_stateText.rectTransform, new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(-40f, -60f), new Vector2(600f, 60f));
+            _fleshText = CreateText(infoPanel.transform, "FleshText", "腐肉: 0", 30, TextAnchor.MiddleLeft, new Color(0.5f, 1f, 0.5f, 1f));
+            SetAnchored(_fleshText.rectTransform, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(20f, -132f), new Vector2(420f, 44f));
+
+            _zombieText = CreateText(infoPanel.transform, "ZombieText", "敌人: 0", 30, TextAnchor.MiddleLeft, new Color(1f, 0.6f, 0.6f, 1f));
+            SetAnchored(_zombieText.rectTransform, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(20f, -184f), new Vector2(420f, 44f));
+
+            // 右上角状态面板（半透明底）
+            GameObject statePanel = CreatePanel(_battlePanel.transform, "StatePanel", new Color(0f, 0f, 0f, 0.3f));
+            SetAnchored(statePanel.GetComponent<RectTransform>(), new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(-20f, -20f), new Vector2(420f, 60f));
+            statePanel.GetComponent<Image>().raycastTarget = false;
+
+            _stateText = CreateText(statePanel.transform, "StateText", "状态: 准备阶段（白天）", 28, TextAnchor.MiddleCenter, new Color(0.8f, 0.8f, 1f, 1f));
+            RectTransform stRt = _stateText.GetComponent<RectTransform>();
+            stRt.anchorMin = Vector2.zero;
+            stRt.anchorMax = Vector2.one;
+            stRt.offsetMin = Vector2.zero;
+            stRt.offsetMax = Vector2.zero;
 
             // 中央提示（战斗说明）
             Text battleHint = CreateText(_battlePanel.transform, "BattleHint", "点击下方按钮进入夜晚\n丧尸将在夜晚来袭", 28, TextAnchor.MiddleCenter, new Color(0.75f, 0.75f, 0.75f, 1f));
@@ -337,7 +357,11 @@ namespace LostIsland.Core
         {
             rt.anchorMin = anchorMin;
             rt.anchorMax = anchorMax;
-            rt.pivot = new Vector2(0.5f, 0.5f);
+
+            // 点锚点（anchorMin == anchorMax）时 pivot 跟随锚点方向，
+            // 保证 anchoredPosition 相对锚点向内偏移，面板/文字不会延伸到屏幕外
+            rt.pivot = (anchorMin == anchorMax) ? anchorMin : new Vector2(0.5f, 0.5f);
+
             rt.anchoredPosition = anchoredPos;
             rt.sizeDelta = size;
         }
@@ -356,6 +380,8 @@ namespace LostIsland.Core
                 _playerEntity.Attribute.SetBaseValue(AttrType.MaxHP, 1000f);
                 _playerEntity.Attribute.SetBaseValue(AttrType.ATK, 100f);
                 _playerEntity.Attribute.SetBaseValue(AttrType.MoveSpeed, 5f);
+                // 确保生命值满血显示（防御：不依赖属性事件的触发时序）
+                _playerEntity.Health.SetCurrentHP(_playerEntity.Health.MaxHP);
                 _playerCtrl = new PlayerController(_playerEntity);
 
                 // 2. 创建灯塔实体
@@ -423,6 +449,11 @@ namespace LostIsland.Core
 
             if (_waveText != null)
                 _waveText.text = $"第 {battleMgr.CurrentWave} / 300 波";
+
+            if (_hpText != null && _playerEntity != null && _playerEntity.Health != null)
+            {
+                _hpText.text = $"生命: {_playerEntity.Health.CurrentHP:F0} / {_playerEntity.Health.MaxHP:F0}";
+            }
 
             if (_fleshText != null)
                 _fleshText.text = $"腐肉: {battleMgr.CurrentFlesh}";
