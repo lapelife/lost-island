@@ -159,8 +159,13 @@ namespace LostIsland.Core
             scaler.referenceResolution = new Vector2(1920f, 1080f);
             scaler.matchWidthOrHeight = 0.5f;
 
-            // 背景
-            CreatePanel(canvasGo.transform, "Background", new Color(0.06f, 0.07f, 0.09f, 1f));
+            // 背景（全屏深色底）
+            GameObject background = CreatePanel(canvasGo.transform, "Background", new Color(0.06f, 0.07f, 0.09f, 1f));
+            RectTransform bgRt = background.GetComponent<RectTransform>();
+            bgRt.anchorMin = Vector2.zero;
+            bgRt.anchorMax = Vector2.one;
+            bgRt.offsetMin = Vector2.zero;
+            bgRt.offsetMax = Vector2.zero;
 
             // 主菜单面板
             _mainMenuPanel = CreatePanel(canvasGo.transform, "MainMenuPanel", new Color(0f, 0f, 0f, 0f));
@@ -310,6 +315,9 @@ namespace LostIsland.Core
                 WaveManager.Instance.StartDay(1);
                 GameManager.Instance.ChangeState(GameState.Battle);
 
+                // 3.5 创建 3D 占位视觉（玩家/灯塔）
+                CreateBattleVisuals();
+
                 // 4. 切换 UI
                 _mainMenuPanel.SetActive(false);
                 _battlePanel.SetActive(true);
@@ -339,6 +347,10 @@ namespace LostIsland.Core
             Text nightBtnText = nightBtn.transform.Find("Text").GetComponent<Text>();
             nightBtnText.text = "战斗进行中…";
             nightBtn.interactable = false;
+
+            // 隐藏入夜提示
+            Transform hint = _battlePanel.transform.Find("BattleHint");
+            if (hint != null) hint.gameObject.SetActive(false);
 
             Debug.Log("[Bootstrap] 进入夜晚，战斗开始");
         }
@@ -374,6 +386,41 @@ namespace LostIsland.Core
                 }
 
                 _stateText.text = $"状态: {stateName}";
+            }
+        }
+
+        #endregion
+
+        #region 3D 占位视觉
+
+        /// <summary>
+        /// 创建简单的 3D 占位对象（玩家/灯塔），提供基础视觉反馈
+        /// </summary>
+        private static void CreateBattleVisuals()
+        {
+            try
+            {
+                // 玩家占位：蓝色胶囊
+                var playerGo = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+                playerGo.name = "PlayerVisual";
+                playerGo.transform.position = new Vector3(0f, 1f, 0f);
+                playerGo.transform.localScale = new Vector3(1.2f, 2f, 1.2f);
+                playerGo.GetComponent<Renderer>().material.color = new Color(0.2f, 0.5f, 1f, 1f);
+                UnityEngine.Object.DontDestroyOnLoad(playerGo);
+
+                // 灯塔占位：黄色方块（玩家身后）
+                var towerGo = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                towerGo.name = "TowerVisual";
+                towerGo.transform.position = new Vector3(0f, 0.5f, 8f);
+                towerGo.transform.localScale = new Vector3(2f, 1f, 2f);
+                towerGo.GetComponent<Renderer>().material.color = new Color(1f, 0.8f, 0.2f, 1f);
+                UnityEngine.Object.DontDestroyOnLoad(towerGo);
+
+                Debug.Log("[Bootstrap] 已创建玩家/灯塔 3D 占位视觉");
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning($"[Bootstrap] 创建 3D 占位视觉失败（不影响游戏逻辑）: {e.Message}");
             }
         }
 
