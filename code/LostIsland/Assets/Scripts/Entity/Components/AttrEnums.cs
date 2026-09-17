@@ -1,6 +1,37 @@
 namespace LostIsland.Entity
 {
     /// <summary>
+    /// 伤害来源类型
+    /// </summary>
+    public enum DamageSourceType
+    {
+        Unknown = 0,    // 未知来源
+        Normal = 1,     // 普通攻击
+        Skill = 2,      // 技能伤害
+        Tower = 3,      // 防御塔伤害
+        Survivor = 4,   // 幸存者伤害
+        Burn = 5,       // 燃烧伤害
+        Explosion = 6,  // 爆炸伤害
+        Reflect = 7,    // 反伤
+    }
+
+    /// <summary>
+    /// 状态效果类型
+    /// </summary>
+    public enum StatusType
+    {
+        None = 0,       // 无状态
+        Burn = 1,       // 燃烧（持续伤害）
+        Slow = 2,       // 减速
+        Stun = 3,       // 眩晕
+        Poison = 4,     // 中毒
+        Freeze = 5,     // 冰冻
+        Shield = 6,     // 护盾
+        Haste = 7,      // 加速
+        Invincible = 8, // 无敌
+    }
+
+    /// <summary>
     /// 属性类型枚举
     /// </summary>
     public enum AttrType

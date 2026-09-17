@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using LostIsland.Core;
+using LostIsland.Entity;
 using LostIsland.Logic.Wave;
 
 namespace LostIsland.Logic.Tower

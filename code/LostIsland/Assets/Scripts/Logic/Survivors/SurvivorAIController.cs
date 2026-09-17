@@ -325,7 +325,7 @@ namespace LostIsland.Logic.Survivors
             var result = DamageResult.Create(damage);
             result.SourceType = DamageSourceType.Skill;
             result.SourceName = Survivor.Data.SurvivorName;
-            result.IsCritical = isCrit;
+            result.IsCrit = isCrit;
 
             Target.TakeDamage(result);
 

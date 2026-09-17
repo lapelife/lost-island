@@ -59,6 +59,21 @@ namespace LostIsland.Entity
         public EntityBase Source;
 
         /// <summary>
+        /// 伤害来源类型
+        /// </summary>
+        public DamageSourceType SourceType;
+
+        /// <summary>
+        /// 伤害来源名称（如技能名、塔名等）
+        /// </summary>
+        public string SourceName;
+
+        /// <summary>
+        /// 是否是技能伤害
+        /// </summary>
+        public bool IsSkillDamage;
+
+        /// <summary>
         /// 创建一个标准伤害结果
         /// </summary>
         public static DamageResult Create(float damage, bool isCrit = false)
@@ -73,7 +88,10 @@ namespace LostIsland.Entity
                 LifestealHeal = 0f,
                 ReflectDamage = 0f,
                 IsTrueDamage = false,
-                DamageReduction = 0f
+                DamageReduction = 0f,
+                SourceType = DamageSourceType.Unknown,
+                SourceName = string.Empty,
+                IsSkillDamage = false
             };
         }
     }
@@ -218,7 +236,23 @@ namespace LostIsland.Entity
             if (IsInvincible) return 0f;
             if (damage.FinalDamage <= 0f) return 0f;
 
-            float actualDamage = Mathf.Min(damage.FinalDamage, _currentHP);
+            float remainingDamage = damage.FinalDamage;
+
+            // 护盾优先吸收伤害
+            if (HasShield)
+            {
+                float absorbed = ConsumeShield(remainingDamage);
+                remainingDamage -= absorbed;
+
+                if (remainingDamage <= 0f)
+                {
+                    // 全部被护盾吸收，仍触发受伤事件
+                    OnTakeDamage?.Invoke(damage);
+                    return 0f;
+                }
+            }
+
+            float actualDamage = Mathf.Min(remainingDamage, _currentHP);
             CurrentHP -= actualDamage;
 
             // 触发受伤事件
@@ -322,6 +356,80 @@ namespace LostIsland.Entity
 
         #endregion
 
+        #region 护盾机制
+
+        private float _shieldAmount = 0f;
+        private float _shieldDuration = 0f;
+        private bool _hasShield = false;
+
+        /// <summary>
+        /// 当前护盾值
+        /// </summary>
+        public float ShieldAmount => _shieldAmount;
+
+        /// <summary>
+        /// 是否有护盾
+        /// </summary>
+        public bool HasShield => _hasShield && _shieldAmount > 0f;
+
+        /// <summary>
+        /// 应用护盾
+        /// </summary>
+        /// <param name="amount">护盾值</param>
+        /// <param name="duration">持续时间（秒），0=永久</param>
+        public void ApplyShield(float amount, float duration = 0f)
+        {
+            if (amount <= 0f) return;
+
+            // 护盾值叠加，取较大值
+            _shieldAmount = Mathf.Max(_shieldAmount, amount);
+            _shieldDuration = Mathf.Max(_shieldDuration, duration);
+            _hasShield = true;
+
+            Debug.Log($"[HealthComponent] 获得护盾: {amount:F0}, 持续: {(duration > 0f ? duration + "秒" : "永久")}");
+        }
+
+        /// <summary>
+        /// 消耗护盾（受到伤害时优先扣护盾）
+        /// </summary>
+        /// <param name="damage"> incoming damage</param>
+        /// <returns>被护盾吸收的伤害量</returns>
+        private float ConsumeShield(float damage)
+        {
+            if (!_hasShield || _shieldAmount <= 0f) return 0f;
+
+            float absorbed = Mathf.Min(_shieldAmount, damage);
+            _shieldAmount -= absorbed;
+
+            if (_shieldAmount <= 0f)
+            {
+                _shieldAmount = 0f;
+                _hasShield = false;
+                _shieldDuration = 0f;
+            }
+
+            return absorbed;
+        }
+
+        /// <summary>
+        /// 更新护盾持续时间
+        /// </summary>
+        public void UpdateShieldTimer(float deltaTime)
+        {
+            if (!_hasShield) return;
+            if (_shieldDuration <= 0f) return; // 永久护盾
+
+            _shieldDuration -= deltaTime;
+            if (_shieldDuration <= 0f)
+            {
+                _shieldAmount = 0f;
+                _shieldDuration = 0f;
+                _hasShield = false;
+            }
+        }
+
+        #endregion
+
         #region 无敌机制
 
         /// <summary>
@@ -373,6 +481,11 @@ namespace LostIsland.Entity
             _invincibleTimer = 0f;
             _isInvincible = false;
             _lastHPPct = 1f;
+
+            // 重置护盾
+            _shieldAmount = 0f;
+            _shieldDuration = 0f;
+            _hasShield = false;
         }
 
         /// <summary>

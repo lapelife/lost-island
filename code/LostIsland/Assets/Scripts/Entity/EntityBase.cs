@@ -248,6 +248,9 @@ namespace LostIsland.Entity
 
             // 更新生命组件的无敌帧
             Health?.UpdateInvincibleTimer(deltaTime);
+
+            // 更新生命组件的护盾计时器
+            Health?.UpdateShieldTimer(deltaTime);
         }
 
         /// <summary>

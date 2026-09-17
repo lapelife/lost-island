@@ -99,6 +99,35 @@ namespace LostIsland.Logic.Wave
 
         #endregion
 
+        #region 状态效果系统
+
+        private Dictionary<StatusType, StatusEffectData> _activeStatuses = new Dictionary<StatusType, StatusEffectData>();
+
+        /// <summary>
+        /// 状态效果数据
+        /// </summary>
+        private class StatusEffectData
+        {
+            public StatusType Type;
+            public float Value;           // 效果数值（如伤害/减速比例）
+            public float Duration;        // 总持续时间
+            public float RemainingTime;   // 剩余时间
+            public float TickTimer;       // 跳变计时器（用于持续伤害）
+            public const float TickInterval = 0.5f; // 每0.5秒跳一次
+        }
+
+        /// <summary>
+        /// 基础移动速度（用于减速效果恢复）
+        /// </summary>
+        private float _baseMoveSpeed;
+
+        /// <summary>
+        /// 当前减速比例
+        /// </summary>
+        private float _currentSlowAmount = 0f;
+
+        #endregion
+
         #region 事件
 
         /// <summary>
@@ -165,6 +194,10 @@ namespace LostIsland.Logic.Wave
 
             Entity.Health.HealFull();
 
+            // 保存基础移速（用于减速效果计算）
+            _baseMoveSpeed = moveSpeed;
+            _currentSlowAmount = 0f;
+
             // 护盾
             if (Config.HasShield)
             {
@@ -228,6 +261,191 @@ namespace LostIsland.Logic.Wave
                 (stunState as ZombieState_Stun)?.SetDuration(duration);
                 ChangeState(ZombieState.Stun);
             }
+        }
+
+        #endregion
+
+        #region 状态效果系统
+
+        /// <summary>
+        /// 应用状态效果
+        /// </summary>
+        /// <param name="statusType">状态类型</param>
+        /// <param name="value">效果数值（伤害/减速比例等）</param>
+        /// <param name="duration">持续时间（秒）</param>
+        public void ApplyStatus(StatusType statusType, float value, float duration)
+        {
+            if (IsDead) return;
+            if (statusType == StatusType.None) return;
+
+            // 如果已有相同状态，刷新持续时间并取最高效果值
+            if (_activeStatuses.TryGetValue(statusType, out var existing))
+            {
+                existing.RemainingTime = Mathf.Max(existing.RemainingTime, duration);
+                existing.Value = Mathf.Max(existing.Value, value);
+                return;
+            }
+
+            // 创建新状态效果
+            var statusData = new StatusEffectData
+            {
+                Type = statusType,
+                Value = value,
+                Duration = duration,
+                RemainingTime = duration,
+                TickTimer = 0f
+            };
+
+            _activeStatuses[statusType] = statusData;
+
+            // 立即应用状态效果
+            OnStatusApplied(statusType, value);
+        }
+
+        /// <summary>
+        /// 状态效果应用时的即时处理
+        /// </summary>
+        private void OnStatusApplied(StatusType statusType, float value)
+        {
+            switch (statusType)
+            {
+                case StatusType.Stun:
+                    // 立即进入眩晕状态
+                    Stun(value > 0f ? value : 0.5f);
+                    break;
+
+                case StatusType.Slow:
+                    // 应用减速
+                    ApplySlowEffect(value);
+                    break;
+
+                case StatusType.Burn:
+                    // 燃烧效果在tick中处理，无需即时处理
+                    break;
+
+                case StatusType.Freeze:
+                    // 冰冻 = 减速 + 短暂眩晕
+                    ApplySlowEffect(value);
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// 应用减速效果
+        /// </summary>
+        private void ApplySlowEffect(float slowAmount)
+        {
+            if (slowAmount <= 0f) return;
+
+            _currentSlowAmount = Mathf.Max(_currentSlowAmount, slowAmount);
+            float newSpeed = _baseMoveSpeed * (1f - Mathf.Clamp01(_currentSlowAmount));
+            MoveComp?.SetBaseSpeed(Mathf.Max(0.1f, newSpeed));
+        }
+
+        /// <summary>
+        /// 移除状态效果
+        /// </summary>
+        private void RemoveStatus(StatusType statusType)
+        {
+            if (!_activeStatuses.ContainsKey(statusType)) return;
+
+            _activeStatuses.Remove(statusType);
+
+            // 处理状态移除后的恢复
+            switch (statusType)
+            {
+                case StatusType.Slow:
+                case StatusType.Freeze:
+                    // 重新计算当前减速（可能有多个减速效果叠加）
+                    RecalculateSlowAmount();
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// 重新计算当前减速总量
+        /// </summary>
+        private void RecalculateSlowAmount()
+        {
+            float maxSlow = 0f;
+            foreach (var kvp in _activeStatuses)
+            {
+                if (kvp.Key == StatusType.Slow || kvp.Key == StatusType.Freeze)
+                {
+                    maxSlow = Mathf.Max(maxSlow, kvp.Value.Value);
+                }
+            }
+
+            _currentSlowAmount = maxSlow;
+            float newSpeed = _baseMoveSpeed * (1f - Mathf.Clamp01(_currentSlowAmount));
+            MoveComp?.SetBaseSpeed(Mathf.Max(0.1f, newSpeed));
+        }
+
+        /// <summary>
+        /// 更新状态效果
+        /// </summary>
+        private void UpdateStatusEffects(float dt)
+        {
+            if (_activeStatuses.Count == 0) return;
+
+            // 收集需要移除的状态
+            List<StatusType> toRemove = null;
+
+            foreach (var kvp in _activeStatuses)
+            {
+                var status = kvp.Value;
+                status.RemainingTime -= dt;
+
+                // 处理持续伤害类型的状态（燃烧、中毒等）
+                if (kvp.Key == StatusType.Burn || kvp.Key == StatusType.Poison)
+                {
+                    status.TickTimer += dt;
+                    if (status.TickTimer >= StatusEffectData.TickInterval)
+                    {
+                        status.TickTimer -= StatusEffectData.TickInterval;
+                        // 造成持续伤害
+                        float tickDamage = status.Value * StatusEffectData.TickInterval;
+                        var dmgResult = DamageResult.Create(tickDamage);
+                        dmgResult.SourceType = DamageSourceType.Burn;
+                        dmgResult.SourceName = kvp.Key.ToString();
+                        TakeDamage(dmgResult);
+                    }
+                }
+
+                // 检查状态是否结束
+                if (status.RemainingTime <= 0f)
+                {
+                    if (toRemove == null) toRemove = new List<StatusType>();
+                    toRemove.Add(kvp.Key);
+                }
+            }
+
+            // 移除过期状态
+            if (toRemove != null)
+            {
+                foreach (var statusType in toRemove)
+                {
+                    RemoveStatus(statusType);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 检查是否有指定状态
+        /// </summary>
+        public bool HasStatus(StatusType statusType)
+        {
+            return _activeStatuses.ContainsKey(statusType);
+        }
+
+        /// <summary>
+        /// 获取状态效果剩余时间
+        /// </summary>
+        public float GetStatusRemainingTime(StatusType statusType)
+        {
+            if (_activeStatuses.TryGetValue(statusType, out var status))
+                return status.RemainingTime;
+            return 0f;
         }
 
         #endregion
@@ -315,7 +533,16 @@ namespace LostIsland.Logic.Wave
                 FinalDamage = actualDamage,
                 RawDamage = damage.RawDamage,
                 IsCrit = damage.IsCrit,
-                Source = damage.Source
+                Source = damage.Source,
+                SourceType = damage.SourceType,
+                SourceName = damage.SourceName,
+                IsSkillDamage = damage.IsSkillDamage,
+                DefReduction = damage.DefReduction,
+                DmgReductionPct = damage.DmgReductionPct,
+                DamageReduction = damage.DamageReduction,
+                LifestealHeal = damage.LifestealHeal,
+                ReflectDamage = damage.ReflectDamage,
+                IsTrueDamage = damage.IsTrueDamage
             };
 
             return Entity.Health.TakeDamage(result);
@@ -372,6 +599,9 @@ namespace LostIsland.Logic.Wave
                 return;
             }
 
+            // 更新状态效果
+            UpdateStatusEffects(dt);
+
             // 更新状态
             _currentState?.Update(dt);
 
@@ -393,6 +623,10 @@ namespace LostIsland.Logic.Wave
             AttackTarget = null;
             ShieldHP = 0f;
             MaxShieldHP = 0f;
+
+            // 清空状态效果
+            _activeStatuses.Clear();
+            _currentSlowAmount = 0f;
 
             MoveComp?.Reset();
             AttackComp?.Reset();
