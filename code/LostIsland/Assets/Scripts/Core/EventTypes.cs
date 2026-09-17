@@ -7,10 +7,14 @@
 using UnityEngine;
 using LostIsland.Logic.Wave;
 using LostIsland.Logic.Tower;
+using LostIsland.Logic.Battle;
 using LostIsland.Entity;
 
 namespace LostIsland.Core
 {
+    // 使用别名解决 BossTier 二义性（Core.BossTier 和 Battle.BossTier）
+    using BattleBossTier = LostIsland.Logic.Battle.BossTier;
+
     // ==============================================
     // 游戏全局事件
     // ==============================================
@@ -61,7 +65,7 @@ namespace LostIsland.Core
     {
         public int WaveNumber;
         public string BossName;
-        public BossTier Tier;
+        public BattleBossTier Tier;
     }
 
     public struct BossDefeatedEvent : IEvent

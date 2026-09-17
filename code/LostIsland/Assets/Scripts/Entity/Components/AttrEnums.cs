@@ -36,16 +36,17 @@ namespace LostIsland.Entity
     /// </summary>
     public enum AttrType
     {
-        MaxHP = 0,              // 最大生命值
-        ATK = 1,                // 攻击力
-        DEF = 2,                // 防御力
-        AttackSpeed = 3,        // 攻击速度（次/秒）
-        CritRate = 4,           // 暴击率
-        CritDamage = 5,         // 暴击伤害倍率
-        MoveSpeed = 6,          // 移动速度
-        Lifesteal = 7,          // 吸血百分比
-        DamageReduction = 8,    // 伤害减免
-        Reflect = 9,            // 反伤百分比
+        Unknown = 0,            // 未知/无效
+        MaxHP = 1,              // 最大生命值
+        ATK = 2,                // 攻击力
+        DEF = 3,                // 防御力
+        AttackSpeed = 4,        // 攻击速度（次/秒）
+        CritRate = 5,           // 暴击率
+        CritDamage = 6,         // 暴击伤害倍率
+        MoveSpeed = 7,          // 移动速度
+        Lifesteal = 8,          // 吸血百分比
+        DamageReduction = 9,    // 伤害减免
+        Reflect = 10,           // 反伤百分比
         // 可扩展更多属性...
         Max
     }

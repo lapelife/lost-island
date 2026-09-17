@@ -5,6 +5,9 @@ using LostIsland.Core;
 using LostIsland.Entity;
 using LostIsland.Logic.Battle;
 
+// 使用别名解决 BossTier 二义性
+using BossTier = LostIsland.Logic.Battle.BossTier;
+
 namespace LostIsland.Logic.Wave
 {
     /// <summary>

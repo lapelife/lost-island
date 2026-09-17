@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using LostIsland.Entity;
+using LostIsland.Core;
 
 namespace LostIsland.Logic.Rune
 {

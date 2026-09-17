@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using LostIsland.Entity;
+using LostIsland.Core;
 
 namespace LostIsland.Logic.Rune
 {
@@ -342,7 +343,7 @@ namespace LostIsland.Logic.Rune
             rune.MainAttrBasePct = 0.15f;
             rune.MainAttrGrowthPerStar = 0.2f;
 
-            rune.SubAttrType = AttrType.LifeSteal;
+            rune.SubAttrType = AttrType.Lifesteal;
             rune.SubAttrBasePct = 0.03f;
 
             rune.MaxStar = 5;

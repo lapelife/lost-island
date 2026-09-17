@@ -1,5 +1,6 @@
 using UnityEngine;
 using LostIsland.Data.Config;
+using LostIsland.Logic.Battle;
 
 namespace LostIsland.Logic.Wave
 {
