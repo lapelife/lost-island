@@ -473,7 +473,7 @@ namespace LostIsland.Tests
             EntityBase entity = new EntityBase();
             entity.Initialize(200, EntityType.Boss, "TestBoss");
 
-            BossController boss = new BossController(entity, config, "TestBoss", BossTier.Normal);
+            BossController boss = new BossController(entity, config, "TestBoss", LostIsland.Core.BossTier.Normal);
             boss.InitAttributes(20, 1, 1f, 1f, 1f);
 
             // 设置阶段配置
@@ -513,7 +513,7 @@ namespace LostIsland.Tests
             EntityBase entity = new EntityBase();
             entity.Initialize(200, EntityType.Boss, "TestBoss");
 
-            BossController boss = new BossController(entity, config, "TestBoss", BossTier.Normal);
+            BossController boss = new BossController(entity, config, "TestBoss", LostIsland.Core.BossTier.Normal);
             boss.InitAttributes(20, 1, 1f, 1f, 1f);
 
             // 检查初始护盾
