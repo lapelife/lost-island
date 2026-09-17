@@ -82,6 +82,9 @@ namespace LostIsland.Core
             // 1. 初始化所有核心系统（逐个容错）
             InitSystems();
 
+            // 1.5 确保场景基础环境（相机/光源），没有场景文件也能正常渲染
+            EnsureSceneEnvironment();
+
             // 2. 创建可互动界面
             CreateUI();
 
@@ -126,6 +129,57 @@ namespace LostIsland.Core
 
         #endregion
 
+        #region 场景环境
+
+        /// <summary>
+        /// 确保场景存在相机与光源（项目无场景文件时自动补齐）
+        /// </summary>
+        private static void EnsureSceneEnvironment()
+        {
+            try
+            {
+                // 相机：没有则创建 Main Camera
+                if (Camera.main == null)
+                {
+                    var camGo = new GameObject("Main Camera");
+                    camGo.tag = "MainCamera";
+                    var cam = camGo.AddComponent<Camera>();
+                    cam.clearFlags = CameraClearFlags.Skybox;
+                    camGo.AddComponent<AudioListener>();
+                    camGo.transform.position = new Vector3(0f, 2f, -10f);
+                    camGo.transform.rotation = Quaternion.Euler(15f, 0f, 0f);
+                    Debug.Log("[Bootstrap] 场景无相机，已自动创建 Main Camera");
+                }
+
+                // 光源：没有则创建方向光
+                if (UnityEngine.Object.FindObjectOfType<Light>() == null)
+                {
+                    var lightGo = new GameObject("Directional Light");
+                    var light = lightGo.AddComponent<Light>();
+                    light.type = LightType.Directional;
+                    light.intensity = 1.2f;
+                    lightGo.transform.rotation = Quaternion.Euler(50f, -30f, 0f);
+                    Debug.Log("[Bootstrap] 场景无光源，已自动创建 Directional Light");
+                }
+
+                // 地面：没有则创建简单地面
+                if (GameObject.Find("Ground") == null)
+                {
+                    var ground = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    ground.name = "Ground";
+                    ground.transform.position = new Vector3(0f, -0.5f, 0f);
+                    ground.transform.localScale = new Vector3(60f, 1f, 60f);
+                    ground.GetComponent<Renderer>().material.color = new Color(0.35f, 0.4f, 0.3f, 1f);
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning($"[Bootstrap] 场景环境创建失败: {e.Message}");
+            }
+        }
+
+        #endregion
+
         #region UI 创建
 
         private static Font GetFont()
@@ -159,8 +213,8 @@ namespace LostIsland.Core
             scaler.referenceResolution = new Vector2(1920f, 1080f);
             scaler.matchWidthOrHeight = 0.5f;
 
-            // 背景（全屏深色底）
-            GameObject background = CreatePanel(canvasGo.transform, "Background", new Color(0.06f, 0.07f, 0.09f, 1f));
+            // 背景（半透明深色底，让场景可见）
+            GameObject background = CreatePanel(canvasGo.transform, "Background", new Color(0.06f, 0.07f, 0.09f, 0.55f));
             RectTransform bgRt = background.GetComponent<RectTransform>();
             bgRt.anchorMin = Vector2.zero;
             bgRt.anchorMax = Vector2.one;
@@ -352,6 +406,9 @@ namespace LostIsland.Core
             Transform hint = _battlePanel.transform.Find("BattleHint");
             if (hint != null) hint.gameObject.SetActive(false);
 
+            // 创建丧尸占位视觉（红色胶囊群，向灯塔推进）
+            CreateZombieVisuals();
+
             Debug.Log("[Bootstrap] 进入夜晚，战斗开始");
         }
 
@@ -421,6 +478,45 @@ namespace LostIsland.Core
             catch (Exception e)
             {
                 Debug.LogWarning($"[Bootstrap] 创建 3D 占位视觉失败（不影响游戏逻辑）: {e.Message}");
+            }
+        }
+
+        /// <summary>
+        /// 创建丧尸占位视觉（红色胶囊群）
+        /// </summary>
+        private static void CreateZombieVisuals()
+        {
+            try
+            {
+                if (GameObject.Find("ZombieVisuals") != null) return;
+
+                var group = new GameObject("ZombieVisuals");
+                UnityEngine.Object.DontDestroyOnLoad(group);
+
+                Vector3[] positions =
+                {
+                    new Vector3(-2f, 1f, 6f),
+                    new Vector3(2f, 1f, 7f),
+                    new Vector3(0f, 1f, 8f),
+                    new Vector3(-4f, 1f, 9f),
+                    new Vector3(4f, 1f, 10f)
+                };
+
+                foreach (var pos in positions)
+                {
+                    var zombie = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+                    zombie.name = "ZombieVisual";
+                    zombie.transform.SetParent(group.transform, false);
+                    zombie.transform.position = pos;
+                    zombie.transform.localScale = new Vector3(0.8f, 1.4f, 0.8f);
+                    zombie.GetComponent<Renderer>().material.color = new Color(0.85f, 0.2f, 0.15f, 1f);
+                }
+
+                Debug.Log("[Bootstrap] 已创建 5 只丧尸占位视觉");
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning($"[Bootstrap] 创建丧尸占位视觉失败（不影响游戏逻辑）: {e.Message}");
             }
         }
 
