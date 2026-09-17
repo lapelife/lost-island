@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>0氪玩家30天数值分析 | 迷失孤岛</title>
+<style>
+:root {
+  --bg: #0a0e14;
+  --surface: #131820;
+  --surface2: #1a212c;
+  --border: #2a3240;
+  --text: #e0e6ed;
+  --text-dim: #8a94a6;
+  --accent: #ff9800;
+  --accent2: #4fc3f7;
+  --danger: #f44336;
+  --success: #4caf50;
+  --warning: #ffd54f;
+  --purple: #ce93d8;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Noto Sans CJK SC', 'Microsoft YaHei', sans-serif;
+  line-height: 1.8;
+  padding: 24px;
+}
+.container { max-width: 1100px; margin: 0 auto; }
+h1 {
+  font-size: 28px;
+  color: var(--accent);
+  border-bottom: 2px solid var(--accent);
+  padding-bottom: 12px;
+  margin-bottom: 24px;
+}
+h2 {
+  font-size: 22px;
+  color: var(--accent2);
+  margin-top: 32px;
+  margin-bottom: 16px;
+  border-left: 4px solid var(--accent2);
+  padding-left: 12px;
+}
+h3 {
+  font-size: 18px;
+  color: var(--warning);
+  margin-top: 24px;
+  margin-bottom: 12px;
+}
+p { margin-bottom: 12px; }
+strong { color: var(--warning); }
+.table-wrap { overflow-x: auto; margin: 16px 0; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  background: var(--surface);
+}
+th, td {
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  text-align: center;
+}
+th {
+  background: var(--surface2);
+  color: var(--accent2);
+  font-weight: 600;
+}
+tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+.callout {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--accent2);
+  padding: 16px;
+  margin: 16px 0;
+  border-radius: 4px;
+}
+.callout--danger { border-left-color: var(--danger); }
+.callout--success { border-left-color: var(--success); }
+.callout--warning { border-left-color: var(--warning); }
+.callout__label {
+  font-weight: bold;
+  color: var(--accent);
+  margin-bottom: 8px;
+  font-size: 15px;
+}
+.formula {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  padding: 14px 18px;
+  margin: 12px 0;
+  border-radius: 6px;
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  color: var(--success);
+  line-height: 2;
+}
+.highlight {
+  background: rgba(255,152,0,0.1);
+  border: 1px solid rgba(255,152,0,0.3);
+  padding: 12px 16px;
+  border-radius: 6px;
+  margin: 12px 0;
+}
+.tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 3px;
+  font-size: 12px;
+  font-weight: bold;
+}
+.tag--danger { background: rgba(244,67,54,0.15); color: var(--danger); }
+.tag--success { background: rgba(76,175,80,0.15); color: var(--success); }
+.tag--warning { background: rgba(255,213,79,0.15); color: var(--warning); }
+.tag--info { background: rgba(79,195,247,0.15); color: var(--accent2); }
+.summary-box {
+  background: linear-gradient(135deg, var(--surface), var(--surface2));
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  padding: 24px;
+  margin: 24px 0;
+}
+.summary-box h3 { margin-top: 0; }
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin: 16px 0;
+}
+@media (max-width: 768px) {
+  .grid-2 { grid-template-columns: 1fr; }
+}
+.step {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 16px;
+  margin: 12px 0;
+}
+.step-num {
+  display: inline-block;
+  width: 28px;
+  height: 28px;
+  line-height: 28px;
+  text-align: center;
+  background: var(--accent);
+  color: var(--bg);
+  border-radius: 50%;
+  font-weight: bold;
+  margin-right: 8px;
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>0氪玩家30天数值分析报告</h1>
+<p><strong>前提条件：</strong>0氪玩家（不花1分钱），累计游戏30天（1个月），每天游戏时长2小时，总游戏时长60小时。</p>
+
+<!-- ========== Part 1: 玩家画像 ========== -->
+<h2>一、30天后玩家画像</h2>
+
+<h3>1.1 角色等级估算</h3>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th>来源</th><th>每日经验</th><th>30天总计</th></tr>
+</thead>
+<tbody>
+<tr><td>主线通关经验</td><td>~20,000（约0.7天/天）</td><td>600,000</td></tr>
+<tr><td>每日副本（3次）</td><td>~6,000</td><td>180,000</td></tr>
+<tr><td>BOSS挑战（3次）</td><td>~4,000</td><td>120,000</td></tr>
+<tr><td>每日任务</td><td>~3,000</td><td>90,000</td></tr>
+<tr><td>波次击杀经验</td><td>~5,000</td><td>150,000</td></tr>
+<tr><td><strong>总计</strong></td><td>~38,000/天</td><td><strong>1,140,000</strong></td></tr>
+</tbody>
+</table>
+</div>
+<p>主线30天对应Lv.60，总经验约1,500,000。玩家积累了约1,140,000经验，对应角色等级约 <strong>Lv.46</strong>（76%的主线进度）。</p>
+
+<h3>1.2 觉醒等级估算（AXP）</h3>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th>AXP来源</th><th>每日产量</th><th>30天总计</th></tr>
+</thead>
+<tbody>
+<tr><td>每日登录</td><td>50</td><td>1,500</td></tr>
+<tr><td>每日任务（3个）</td><td>90</td><td>2,700</td></tr>
+<tr><td>波次通关（1 AXP/波）</td><td>~250（平均清250波）</td><td>7,500</td></tr>
+<tr><td>击杀BOSS（20 AXP/个）</td><td>~240（12个BOSS/天均）</td><td>7,200</td></tr>
+<tr><td>累计在线时长（5 AXP/10分钟）</td><td>60（2小时=12×5）</td><td>1,800</td></tr>
+<tr><td>每日副本（40 AXP/次×3）</td><td>120</td><td>3,600</td></tr>
+<tr><td>每周任务（200 AXP/周）</td><td>~29</td><td>870</td></tr>
+<tr><td>每日首胜</td><td>100</td><td>3,000</td></tr>
+<tr><td>老兵加成（30天=+5% AXP）</td><td>—</td><td>约+5%总量</td></tr>
+<tr><td><strong>总计</strong></td><td>~939/天</td><td><strong>~28,170 AXP</strong></td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout">
+<div class="callout__label">觉醒等级计算</div>
+<p>AXP升级需求：AL 1-10每级1,000 AXP（共10,000）；AL 11-25每级3,000 AXP</p>
+<p>28,170 AXP分配：</p>
+<p>• AL 0→10 = 消耗10,000 AXP → 达到 <strong>AL-10</strong></p>
+<p>• 剩余18,170 AXP ÷ 3,000/级 = 6.06级 → 达到 <strong>AL-16</strong></p>
+<p><strong>最终觉醒等级：AL-16</strong>，AwakeningMultiplier = 1.0 + 16×0.025 = <strong>×1.40</strong></p>
+</div>
+
+<h3>1.3 赛季传承</h3>
+<p>30天 = 1个月 = 1个赛季。赛季结束时将本赛季AXP的10%转化为传承点：28,170 × 10% = 2,817 → 取整 = <strong>2个传承点</strong>（2%全属性）。传承加成 = ×1.02。</p>
+
+<h3>1.4 装备/符文/皮肤/幸存者估算</h3>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th>系统</th><th>30天后预估状态</th><th>ATK加成</th></tr>
+</thead>
+<tbody>
+<tr><td>装备</td><td>全紫色套装 + 1-2件金色</td><td>+1,500 固定ATK</td></tr>
+<tr><td>技能卡</td><td>蓝色+紫色混搭，部分升级</td><td>+38% ATK</td></tr>
+<tr><td>符文</td><td>2颗蓝色符文（+8%各）</td><td>+10% ATK</td></tr>
+<tr><td>皮肤</td><td>蓝色皮肤（晶核解锁）</td><td>+5% ATK</td></tr>
+<tr><td>幸存者</td><td>3-4名幸存者分配</td><td>+12% ATK</td></tr>
+<tr><td>塔内设施</td><td>武器室+中级防御</td><td>+12% ATK</td></tr>
+</tbody>
+</table>
+</div>
+
+</div>
+
+<!-- ========== Part 2: 属性计算 ========== -->
+<h2>二、角色最终属性计算</h2>
+
+<div class="step">
+<span class="step-num">1</span><strong>角色等级基础ATK（Lv.46）</strong>
+<div class="formula">
+BaseATK = 50 × 1.06^(46-1) = 50 × 1.06^45<br>
+1.06^10 ≈ 1.791<br>
+1.06^20 ≈ 1.791² ≈ 3.207<br>
+1.06^40 ≈ 3.207² ≈ 10.29<br>
+1.06^45 = 10.29 × 1.06^5 = 10.29 × 1.338 ≈ 13.77<br>
+BaseATK = 50 × 13.77 = <strong>689</strong>
+</div>
+</div>
+
+<div class="step">
+<span class="step-num">2</span><strong>角色等级基础HP（Lv.46）</strong>
+<div class="formula">
+BaseHP = 500 × 1.08^45<br>
+1.08^40 ≈ 21.72<br>
+1.08^45 = 21.72 × 1.08^5 = 21.72 × 1.469 ≈ 31.91<br>
+BaseHP = 500 × 31.91 = <strong>15,955</strong>
+</div>
+</div>
+
+<div class="step">
+<span class="step-num">3</span><strong>角色等级基础DEF（Lv.46）</strong>
+<div class="formula">
+BaseDEF = 20 × 1.05^45<br>
+1.05^40 ≈ 7.04<br>
+1.05^45 = 7.04 × 1.05^5 = 7.04 × 1.276 ≈ 8.98<br>
+BaseDEF = 20 × 8.98 = <strong>180</strong>
+</div>
+</div>
+
+<div class="step">
+<span class="step-num">4</span><strong>其他基础属性</strong>
+<div class="formula">
+攻速 AS = 1.0 + 0.02×45 = <strong>1.90 次/秒</strong><br>
+暴击率 CR = 5% + 0.1%×45 = <strong>9.5%</strong><br>
+暴击伤害 CD = 150% + 1%×45 = <strong>195%</strong>（倍率1.95）
+</div>
+</div>
+
+<div class="step">
+<span class="step-num">5</span><strong>最终ATK计算（完整7层公式 + 觉醒 + 传承）</strong>
+<div class="formula">
+FinalATK = (BaseATK + EquipATK) × (1+技能卡%) × (1+符文%) × AwakeningMultiplier × (1+皮肤%) × (1+幸存者%) × (1+设施%) × (1+传承%)
+
+= (689 + 1,500) × 1.38 × 1.10 × 1.40 × 1.05 × 1.12 × 1.12 × 1.02
+
+Step1: 689 + 1,500 = <strong>2,189</strong><br>
+Step2: 2,189 × 1.38 = <strong>3,021</strong><br>
+Step3: 3,021 × 1.10 = <strong>3,323</strong><br>
+Step4: 3,323 × 1.40 = <strong>4,652</strong>  ← 觉醒AL-16贡献<br>
+Step5: 4,652 × 1.05 = <strong>4,885</strong><br>
+Step6: 4,885 × 1.12 = <strong>5,471</strong><br>
+Step7: 5,471 × 1.12 = <strong>6,128</strong><br>
+Step8: 6,128 × 1.02 = <strong>6,250</strong>
+
+FinalATK ≈ <strong>6,250</strong>
+</div>
+</div>
+
+<div class="step">
+<span class="step-num">6</span><strong>DPS计算（期望伤害）</strong>
+<div class="formula">
+期望伤害系数 = 1 + CR × (CD倍率 - 1) = 1 + 0.095 × (1.95 - 1) = 1 + 0.090 = <strong>1.090</strong><br>
+<br>
+基础DPS = FinalATK × AS × 期望系数<br>
+= 6,250 × 1.90 × 1.090<br>
+= 6,250 × 2.071<br>
+= <strong>12,944</strong><br>
+<br>
+加上技能卡爆发（6张卡，约提升50%有效DPS）：<br>
+DPS(含技能) = 12,944 × 1.50 = <strong>19,416</strong><br>
+<br>
+加上腐肉升级满级（+50% ATK）：<br>
+DPS(含腐肉) = 19,416 × 1.50 = <strong>29,124</strong><br>
+<br>
+加上狂暴模式（×2，持续15秒）：<br>
+DPS(全buff) = 29,124 × 2 = <strong>58,248</strong>（15秒爆发）<br>
+<br>
+加上防御塔/陷阱辅助（+30%）：<br>
+DPS(含塔防) = 29,124 × 1.30 = <strong>37,861</strong>（持续输出）<br>
+DPS(全buff含塔防) = 58,248 × 1.30 = <strong>75,722</strong>（15秒爆发）
+</div>
+</div>
+
+<div class="callout callout--success">
+<div class="callout__label">0氪玩家30天后属性总览</div>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th>属性</th><th>数值</th></tr>
+</thead>
+<tbody>
+<tr><td>角色等级</td><td><strong>Lv.46</strong></td></tr>
+<tr><td>觉醒等级</td><td><strong>AL-16</strong>（×1.40）</td></tr>
+<tr><td>传承点</td><td><strong>2点</strong>（×1.02）</td></tr>
+<tr><td>最终ATK</td><td><strong>6,250</strong></td></tr>
+<tr><td>最终HP</td><td><strong>~22,337</strong></td></tr>
+<tr><td>攻速</td><td><strong>1.90 次/秒</strong></td></tr>
+<tr><td>暴击率/暴伤</td><td><strong>9.5% / 195%</strong></td></tr>
+<tr><td>基础DPS（无buff）</td><td><strong>12,944</strong></td></tr>
+<tr><td>DPS（含技能卡）</td><td><strong>19,416</strong></td></tr>
+<tr><td>DPS（含腐肉+技能）</td><td><strong>29,124</strong></td></tr>
+<tr><td>DPS（含腐肉+技能+塔防）</td><td><strong>37,861</strong></td></tr>
+<tr><td>DPS（全buff爆发15秒）</td><td><strong>75,722</strong></td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<!-- ========== Part 3: 天数推算 ========== -->
+<h2>三、能打到第几天？</h2>
+
+<h3>3.1 每天游戏时长消耗</h3>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th>生存天数</th><th>波次平均间隔</th><th>夜间时长（300波）</th><th>白天准备</th><th>总计</th></tr>
+</thead>
+<tbody>
+<tr><td>第1-5天</td><td>~29秒</td><td>145分钟</td><td>10分钟</td><td>~155分钟</td></tr>
+<tr><td>第6-10天</td><td>~26秒</td><td>130分钟</td><td>12分钟</td><td>~142分钟</td></tr>
+<tr><td>第11-15天</td><td>~23秒</td><td>115分钟</td><td>15分钟</td><td>~130分钟</td></tr>
+<tr><td>第16-20天</td><td>~20秒</td><td>100分钟</td><td>15分钟</td><td>~115分钟</td></tr>
+<tr><td>第21-25天</td><td>~17秒</td><td>85分钟</td><td>15分钟</td><td>~100分钟</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>3.2 总时长分配（60小时 = 3,600分钟）</h3>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th>天数</th><th>天数小计</th><th>含重试预估</th><th>累计耗时</th><th>剩余时间</th></tr>
+</thead>
+<tbody>
+<tr><td>第1-5天</td><td>775分钟</td><td>775分钟</td><td>775分钟</td><td>2,825分钟</td></tr>
+<tr><td>第6-10天</td><td>710分钟</td><td>710分钟</td><td>1,485分钟</td><td>2,115分钟</td></tr>
+<tr><td>第11-15天</td><td>650分钟</td><td>650分钟</td><td>2,135分钟</td><td>1,465分钟</td></tr>
+<tr><td>第16-18天</td><td>345分钟</td><td>450分钟（含重试）</td><td>2,585分钟</td><td>1,015分钟</td></tr>
+<tr><td>第19-20天</td><td>230分钟</td><td>400分钟（含重试）</td><td>2,985分钟</td><td>615分钟</td></tr>
+<tr><td>第21-22天</td><td>200分钟</td><td>350分钟（含重试）</td><td>3,335分钟</td><td>265分钟</td></tr>
+<tr><td>第23天</td><td>100分钟</td><td>200分钟（含重试）</td><td>3,535分钟</td><td>65分钟</td></tr>
+</tbody>
+</table>
+</div>
+
+<p>还需扣除每日副本、BOSS挑战等时间（约总时长的15%）：3,600 × 0.85 = <strong>3,060分钟可用于主线</strong></p>
+
+<div class="callout callout--warning">
+<div class="callout__label">天数结论</div>
+<p>扣除15%支线时间后，可用主线时间3,060分钟。按上表消耗：</p>
+<p>• 完成第1-18天：约2,585分钟 → 剩余475分钟</p>
+<p>• 完成第19-20天：约400分钟 → 剩余75分钟</p>
+<p>• 第21-22天需350分钟 → 时间不足，只能再推进1天</p>
+<p><strong>结论：0氪玩家30天后可推进到第20-22天，取中间值≈第21天。</strong></p>
+</div>
+
+<h3>3.3 第21天能否存活验证</h3>
+<p>关键验证：第21天第300波普通丧尸，玩家是否能在波次间隔内击杀？</p>
+<div class="formula">
+第21天系数 = 1.10^20 = 6.727<br>
+第300波系数 = 1.02^299 = 379.2<br>
+<br>
+丧尸HP = 100 × 379.2 × 6.727 = <strong>255,126</strong>（约25.5万）<br>
+丧尸DEF = 5 × 1.01^299 × 1.05^20 = 5 × 19.6 × 2.653 = <strong>260</strong><br>
+<br>
+减伤率 = 260 / (260 + 200 + 460) = 260/920 = <strong>28.3%</strong><br>
+<br>
+有效DPS（含腐肉+技能+塔防，不含狂暴）：<br>
+= 37,861 × (1 - 0.283) = 37,861 × 0.717 = <strong>27,147</strong><br>
+<br>
+击杀1只丧尸时间 = 255,126 / 27,147 = <strong>9.4秒</strong><br>
+<br>
+波次间隔（第300波）= 15-16秒<br>
+9.4秒 < 15秒 → <span class="tag tag--success">✅ 可存活</span><br>
+<br>
+若每波2只丧尸：9.4×2 = 18.8秒 > 15秒 → 需要狂暴/技能辅助<br>
+狂暴15秒内DPS = 75,722 × 0.717 = 54,292<br>
+15秒可造成伤害 = 54,292 × 15 = 814,380 → 可杀3只 → <span class="tag tag--success">✅ 狂暴窗口内可清场</span>
+</div>
+
+<div class="callout callout--success">
+<div class="callout__label">最终结论</div>
+<p><strong>0氪玩家30天后可推进到第21天左右。</strong></p>
+<p>• 第1-18天：可顺利通关全部300波</p>
+<p>• 第19-21天：后50波需要合理使用狂暴+技能卡，但可以存活</p>
+<p>• 第22天+：开始出现"打不动"的情况，可能需要多天积累资源后再推进</p>
+</div>
+
+</div>
+
+<!-- ========== Part 4: BOSS击杀时间 ========== -->
+<h2>四、BOSS击杀时间计算</h2>
+
+<p>以下基于<strong>第21天</strong>的玩家属性（AL-16, Lv.46, DPS如上计算），计算不同波次BOSS的击杀时间。</p>
+
+<h3>4.1 BOSS属性一览（第21天）</h3>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th>BOSS</th><th>波次</th><th>类型</th><th>BOSS HP</th><th>BOSS DEF</th><th>减伤率</th></tr>
+</thead>
+<tbody>
+<tr><td>第1个BOSS</td><td>W20</td><td>通用</td><td>100×1.02^19×1.10^20×50 = <strong>48,951</strong></td><td>5×1.01^19×1.05^20×8 = <strong>128</strong></td><td>15.6%</td></tr>
+<tr><td>第2个BOSS</td><td>W40</td><td>通用</td><td>100×1.02^39×1.10^20×50 = <strong>72,635</strong></td><td>5×1.01^39×1.05^20×8 = <strong>155</strong></td><td>17.9%</td></tr>
+<tr><td>第3个BOSS</td><td>W60</td><td>通用</td><td>100×1.02^59×1.10^20×50 = <strong>107,771</strong></td><td>5×1.01^59×1.05^20×8 = <strong>190</strong></td><td>20.7%</td></tr>
+<tr><td>第4个BOSS</td><td>W80</td><td>通用</td><td>100×1.02^79×1.10^20×50 = <strong>159,929</strong></td><td>5×1.01^79×1.05^20×8 = <strong>233</strong></td><td>23.9%</td></tr>
+<tr><td>第5个BOSS</td><td>W100</td><td>里程碑</td><td>100×1.02^99×1.10^20×100 = <strong>487,310</strong></td><td>5×1.01^99×1.05^20×12 = <strong>428</strong></td><td>37.9%</td></tr>
+<tr><td>第6个BOSS</td><td>W120</td><td>通用</td><td>100×1.02^119×1.10^20×50 = <strong>352,470</strong></td><td>5×1.01^119×1.05^20×8 = <strong>349</strong></td><td>31.5%</td></tr>
+<tr><td>第7个BOSS</td><td>W140</td><td>通用</td><td>100×1.02^139×1.10^20×50 = <strong>523,138</strong></td><td>5×1.01^139×1.05^20×8 = <strong>426</strong></td><td>35.8%</td></tr>
+<tr><td>第8个BOSS</td><td>W160</td><td>通用</td><td>100×1.02^159×1.10^20×50 = <strong>776,483</strong></td><td>5×1.01^159×1.05^20×8 = <strong>520</strong></td><td>39.6%</td></tr>
+<tr><td>第9个BOSS</td><td>W180</td><td>通用</td><td>100×1.02^179×1.10^20×50 = <strong>1,153,077</strong></td><td>5×1.01^179×1.05^20×8 = <strong>636</strong></td><td>43.4%</td></tr>
+<tr><td>第10个BOSS</td><td>W200</td><td>里程碑</td><td>100×1.02^199×1.10^20×100 = <strong>3,431,868</strong></td><td>5×1.01^199×1.05^20×12 = <strong>1,150</strong></td><td>55.6%</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>4.2 BOSS击杀时间（3种输出状态）</h3>
+<p><strong>状态A - 无buff</strong>：DPS = 12,944 × 1.5（技能） = 19,416</p>
+<p><strong>状态B - 持续输出</strong>：DPS = 19,416 × 1.5（腐肉）× 1.3（塔防） = 37,861</p>
+<p><strong>状态C - 全buff爆发</strong>：DPS = 37,861 × 2（狂暴） = 75,722（持续15秒）</p>
+
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+<th>BOSS</th>
+<th>波次</th>
+<th>BOSS HP</th>
+<th>状态A 无buff</th>
+<th>状态B 持续输出</th>
+<th>状态C 全buff</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>第1个通用BOSS</td>
+<td>W20</td>
+<td>48,951</td>
+<td>2.99秒</td>
+<td>1.53秒</td>
+<td><strong>0.85秒</strong></td>
+</tr>
+<tr>
+<td>第2个通用BOSS</td>
+<td>W40</td>
+<td>72,635</td>
+<td>4.53秒</td>
+<td>2.32秒</td>
+<td><strong>1.27秒</strong></td>
+</tr>
+<tr>
+<td>第3个通用BOSS</td>
+<td>W60</td>
+<td>107,771</td>
+<td>7.02秒</td>
+<td>3.59秒</td>
+<td><strong>1.88秒</strong></td>
+</tr>
+<tr>
+<td>第4个通用BOSS</td>
+<td>W80</td>
+<td>159,929</td>
+<td>10.97秒</td>
+<td>5.51秒</td>
+<td><strong>2.77秒</strong></td>
+</tr>
+<tr>
+<td>第5个(里程碑)</td>
+<td>W100</td>
+<td>487,310</td>
+<td>40.2秒</td>
+<td>20.8秒</td>
+<td><strong>10.4秒</strong></td>
+</tr>
+<tr>
+<td>第6个通用BOSS</td>
+<td>W120</td>
+<td>352,470</td>
+<td>26.5秒</td>
+<td>13.6秒</td>
+<td><strong>6.15秒</strong></td>
+</tr>
+<tr>
+<td>第7个通用BOSS</td>
+<td>W140</td>
+<td>523,138</td>
+<td>42.5秒</td>
+<td>21.6秒</td>
+<td><strong>10.5秒</strong></td>
+</tr>
+<tr>
+<td>第8个通用BOSS</td>
+<td>W160</td>
+<td>776,483</td>
+<td>67.7秒</td>
+<td>33.9秒</td>
+<td><strong>16.7秒</strong></td>
+</tr>
+<tr>
+<td>第9个通用BOSS</td>
+<td>W180</td>
+<td>1,153,077</td>
+<td>105.5秒</td>
+<td>53.5秒</td>
+<td><strong>26.8秒</strong></td>
+</tr>
+<tr>
+<td>第10个(里程碑)</td>
+<td>W200</td>
+<td>3,431,868</td>
+<td>399.0秒</td>
+<td>205.3秒</td>
+<td><strong>102.6秒</strong></td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<p style="font-size:13px;color:var(--text-dim);">注：状态C全buff为狂暴15秒窗口，超过15秒后回落到状态B。W180和W200的BOSS因HP较高，需要狂暴+技能全开+后续持续输出完成。</p>
+
+<h3>4.3 实际BOSS战时间（含狂暴窗口+后续输出）</h3>
+<p>对于HP较高的BOSS，玩家先在15秒狂暴窗口内爆发，之后回落到状态B持续输出：</p>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th>BOSS</th><th>波次</th><th>HP</th><th>狂暴15秒伤害</th><th>剩余HP</th><th>后续时间(状态B)</th><th>总计</th></tr>
+</thead>
+<tbody>
+<tr><td>W20通用</td><td>第1个</td><td>48,951</td><td>64,363</td><td>0（已击杀）</td><td>0秒</td><td><strong>0.85秒</strong></td></tr>
+<tr><td>W100里程碑</td><td>第5个</td><td>487,310</td><td>644,317</td><td>0（已击杀）</td><td>0秒</td><td><strong>10.4秒</strong></td></tr>
+<tr><td>W160通用</td><td>第8个</td><td>776,483</td><td>644,317</td><td>132,166</td><td>132,166/23,018=5.7秒</td><td><strong>20.7秒</strong></td></tr>
+<tr><td>W180通用</td><td>第9个</td><td>1,153,077</td><td>644,317</td><td>508,760</td><td>508,760/21,440=23.7秒</td><td><strong>38.7秒</strong></td></tr>
+<tr><td>W200里程碑</td><td>第10个</td><td>3,431,868</td><td>644,317</td><td>2,787,551</td><td>2,787,551/16,785=166.1秒</td><td><strong>181.1秒 ≈ 3.0分钟</strong></td></tr>
+</tbody>
+</table>
+</div>
+<p style="font-size:13px;color:var(--text-dim);">注：狂暴15秒伤害 = 75,722×(1-减伤率)×15。后续输出用状态B有效DPS计算（已扣减伤率）。</p>
+
+</div>
+
+<!-- ========== Part 5: 总结 ========== -->
+<h2>五、总结回答</h2>
+
+<div class="summary-box">
+<h3>📌 核心结论</h3>
+
+<div class="grid-2">
+<div>
+<h3 style="color:var(--accent2);">能打到第几天？</h3>
+<div class="callout callout--success">
+<p style="font-size:20px;"><strong>≈ 第21天</strong></p>
+<p>• 第1-18天：顺利通关300波</p>
+<p>• 第19-21天：后50波需合理用狂暴</p>
+<p>• 第22天+：开始吃力，需多天积累</p>
+</div>
+</div>
+<div>
+<h3 style="color:var(--accent2);">打普通BOSS最短多久？</h3>
+<div class="callout callout--success">
+<p style="font-size:20px;"><strong>≈ 0.85秒（W20，全buff）</strong></p>
+<p>• 无buff：约3秒</p>
+<p>• 持续输出（含腐肉+塔防）：约1.5秒</p>
+<p>• 全buff爆发：约0.85秒</p>
+</div>
+</div>
+</div>
+
+<div class="grid-2">
+<div>
+<h3 style="color:var(--warning);">打里程碑BOSS最短多久？</h3>
+<div class="callout callout--warning">
+<p style="font-size:20px;"><strong>≈ 10.4秒（W100，全buff）</strong></p>
+<p>• 无buff：约40秒</p>
+<p>• 持续输出：约21秒</p>
+<p>• 全buff爆发：约10秒</p>
+</div>
+</div>
+<div>
+<h3 style="color:var(--danger);">打最难BOSS多久？</h3>
+<div class="callout callout--danger">
+<p style="font-size:20px;"><strong>≈ 3.0分钟（W200里程碑）</strong></p>
+<p>• 无buff：约6.7分钟</p>
+<p>• 持续输出：约3.4分钟</p>
+<p>• 全buff+后续：约3.0分钟</p>
+</div>
+</div>
+</div>
+
+</div>
+
+<h3>5.2 各BOSS击杀时间速查表</h3>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th>BOSS</th><th>波次</th><th>无buff</th><th>持续输出</th><th>全buff</th><th>实际（含狂暴窗口+后续）</th></tr>
+</thead>
+<tbody>
+<tr><td>通用BOSS·最易</td><td>W20</td><td>3.0秒</td><td>1.5秒</td><td>0.85秒</td><td><strong>0.85秒</strong></td></tr>
+<tr><td>通用BOSS·中段</td><td>W100</td><td>40秒</td><td>21秒</td><td>10秒</td><td><strong>10.4秒</strong></td></tr>
+<tr><td>通用BOSS·后段</td><td>W180</td><td>106秒</td><td>54秒</td><td>27秒</td><td><strong>38.7秒</strong></td></tr>
+<tr><td>里程碑BOSS·W100</td><td>W100</td><td>40秒</td><td>21秒</td><td>10秒</td><td><strong>10.4秒</strong></td></tr>
+<tr><td>里程碑BOSS·W200</td><td>W200</td><td>6.7分钟</td><td>3.4分钟</td><td>1.7分钟</td><td><strong>3.0分钟</strong></td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout callout--info">
+<div class="callout__label">关键发现</div>
+<p><strong>1. 普通BOSS不是问题：</strong>前4个通用BOSS（W20-W80）在全buff下1-3秒即可击杀，毫无压力。即便是中段BOSS（W100-W140）也只需10-21秒。</p>
+<br>
+<p><strong>2. 后段BOSS开始吃力：</strong>W180通用BOSS需要约39秒，W200里程碑BOSS需要约3分钟。但此时玩家可能已进入第21天后半段，这是合理的高难度体验。</p>
+<br>
+<p><strong>3. 觉醒系统贡献显著：</strong>AL-16的×1.40乘数将玩家ATK从4,652提升到6,250，贡献了34%的最终属性。如果没有觉醒系统，W200 BOSS击杀时间将从3分钟延长到4.2分钟。</p>
+<br>
+<p><strong>4. 狂暴模式是关键窗口：</strong>15秒狂暴期内DPS翻倍，对于HP低于65万的BOSS可以一击必杀。玩家需要合理安排狂暴时机。</p>
+<br>
+<p><strong>5. 长期来看：</strong>玩家继续游玩2-3个月后，觉醒等级可达AL-40-50（×1.75-2.0），传承点积累5-8点（×1.05-1.08），DPS可提升至5-6万（持续），届时W200 BOSS可在1分钟内击杀。</p>
+</div>
+
+</div>
+</div>
+</body>
+</html>
